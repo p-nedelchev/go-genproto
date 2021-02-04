@@ -5,6 +5,7 @@ package request
 // var  contextAuthKey       = request.ContextKey("authorization")
 type ContextKey string
 
+// String implements Stringer interface.
 func (c ContextKey) String() string {
 	return "request " + string(c)
 }
