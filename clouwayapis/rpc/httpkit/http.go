@@ -10,6 +10,12 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// UnmarshallJSON decodes the message bytes into a protobuf message.
+func UnmarshallJSON(b []byte, m proto.Message) error {
+	unmarshaller := protojson.UnmarshalOptions{DiscardUnknown: true}
+	return unmarshaller.Unmarshal(b, m)
+}
+
 // EncodeHTTPGenericResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer. Primarily useful in a server.
 func EncodeHTTPGenericResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {

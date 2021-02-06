@@ -17,6 +17,16 @@ import (
 // by the HTTP clients.
 const JSONContentType = "application/json; charset=utf-8"
 
+// NewBadRequestError is creating a status error for bad request by formatting
+// the passed format and arguments into a messages. The response of this error
+// will be:
+// 		{"message": "invalid json message '123'"}
+func NewBadRequestError(format string, a ...interface{}) error {
+	st := status.Newf(codes.InvalidArgument, format, a...)
+	return st.Err()
+
+}
+
 // ErrorEncoder writes the error to the ResponseWriter, by default a content
 // type of application/json, a body of json with key "message" and the value
 // error.Error(), and a status code of 500. If the error implements Headerer,
