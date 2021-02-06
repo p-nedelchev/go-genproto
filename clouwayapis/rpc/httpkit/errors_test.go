@@ -29,7 +29,7 @@ type test struct {
 	want  want
 }
 
-func TestEncodeError(t *testing.T) {
+func TestErrorEncoder(t *testing.T) {
 	tests := []test{
 		{
 			input: input{code: codes.NotFound, message: "not found", details: nil},
@@ -79,7 +79,7 @@ func TestEncodeError(t *testing.T) {
 		}
 
 		rec := httptest.NewRecorder()
-		httpkit.EncodeError(context.Background(), st.Err(), rec)
+		httpkit.ErrorEncoder(context.Background(), st.Err(), rec)
 
 		for whn, whv := range test.want.headers {
 			headerValue := rec.Header().Get(whn)
