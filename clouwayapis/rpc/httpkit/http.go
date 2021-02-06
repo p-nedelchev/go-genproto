@@ -10,8 +10,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// UnmarshallJSON decodes the message bytes into a protobuf message.
-func UnmarshallJSON(b []byte, m proto.Message) error {
+// UnmarshalJSON decodes the message bytes into a protobuf message.
+func UnmarshalJSON(b []byte, m proto.Message) error {
 	unmarshaller := protojson.UnmarshalOptions{DiscardUnknown: true}
 	return unmarshaller.Unmarshal(b, m)
 }
