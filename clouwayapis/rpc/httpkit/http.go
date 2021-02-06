@@ -12,11 +12,28 @@ import (
 // are added with request.ContextKey as and lookups should be performed by using the same
 // type.
 func HeadersToContext(ctx context.Context, r *http.Request) context.Context {
+	return HeadersToContextExcluding(ctx, r, []string{})
+}
+
+// HeadersToContextExcluding adds all HTTP header values into the passed context.Context. The keys
+// are added with request.ContextKey as and lookups should be performed by using the same
+// type.
+func HeadersToContextExcluding(ctx context.Context, r *http.Request, excludeHeaders []string) context.Context {
+	m := make(map[string]bool)
+	for _, header := range excludeHeaders {
+		m[strings.ToLower(header)] = true
+	}
+
 	for k := range r.Header {
+		key := strings.ToLower(k)
+
+		_, ok := m[strings.ToLower(k)]
+		if ok {
+			continue
+		}
 		// The key is added in strings.ToLower which is the grpc metadata format of the key so
 		// that it can be accessed in either format
-		key := request.ContextKey(strings.ToLower(k))
-		ctx = context.WithValue(ctx, key, r.Header.Get(k))
+		ctx = context.WithValue(ctx, request.ContextKey(key), r.Header.Get(k))
 	}
 
 	// Tune specific change.
