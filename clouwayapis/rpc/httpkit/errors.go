@@ -13,7 +13,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const contentType = "application/json; charset=utf-8"
+// JSONContentType is the default value of JSON messages recognized
+// by the HTTP clients.
+const JSONContentType = "application/json; charset=utf-8"
 
 // ErrorEncoder writes the error to the ResponseWriter, by default a content
 // type of application/json, a body of json with key "message" and the value
@@ -24,7 +26,7 @@ const contentType = "application/json; charset=utf-8"
 // form of the error will be used. If the error implements StatusCoder, the
 // provided StatusCode will be used instead of 500.
 func ErrorEncoder(_ context.Context, err error, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Type", JSONContentType)
 	if headerer, ok := err.(httptransport.Headerer); ok {
 		for k := range headerer.Headers() {
 			w.Header().Set(k, headerer.Headers().Get(k))
