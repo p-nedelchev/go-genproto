@@ -1,17 +1,17 @@
-package rpc_test
+package grpckit_test
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/clouway/go-genproto/clouwayapis/rpc"
 	"github.com/clouway/go-genproto/clouwayapis/rpc/errdetails"
+	"github.com/clouway/go-genproto/clouwayapis/rpc/grpckit"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func TestValidation(t *testing.T) {
-	err := rpc.ValidateRequest(&sampleMessage{Name: ""})
+	err := grpckit.ValidateRequest(&sampleMessage{Name: ""})
 	if err == nil {
 		t.Errorf("expected BadRequest error from rpc.ValidateRequest, but got nil")
 	}

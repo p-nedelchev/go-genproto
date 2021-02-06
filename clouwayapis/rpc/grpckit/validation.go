@@ -1,4 +1,4 @@
-package rpc
+package grpckit
 
 // A generic integration with protoc-gen-validate that generates helper code
 // for validation of protobuf messages. The internal interface of this package
