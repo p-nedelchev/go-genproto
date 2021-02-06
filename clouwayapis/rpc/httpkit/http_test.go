@@ -2,12 +2,29 @@ package httpkit_test
 
 import (
 	"context"
+	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/clouway/go-genproto/clouwayapis/rpc/errdetails"
 	"github.com/clouway/go-genproto/clouwayapis/rpc/httpkit"
 	"github.com/clouway/go-genproto/clouwayapis/rpc/request"
 )
+
+func TestEncodeHTTPGenericResponse(t *testing.T) {
+	protoResponse := &errdetails.ErrorInfo{Reason: "Test Reason"}
+	w := httptest.NewRecorder()
+	httpkit.EncodeHTTPGenericResponse(context.Background(), w, protoResponse)
+	b, _ := ioutil.ReadAll(w.Result().Body)
+	body := string(b)
+	want := `{"reason":"Test Reason"}`
+
+	if body != want {
+		t.Errorf("unexpected response of EncodeHTTPGenericResponse:\n- want: %v\n-  got: %v", want, body)
+	}
+
+}
 
 func TestHeadersToContext(t *testing.T) {
 	ctx := context.Background()

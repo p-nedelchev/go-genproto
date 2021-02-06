@@ -6,7 +6,22 @@ import (
 	"strings"
 
 	"github.com/clouway/go-genproto/clouwayapis/rpc/request"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
+
+// EncodeHTTPGenericResponse is a transport/http.EncodeResponseFunc that encodes
+// the response as JSON to the response writer. Primarily useful in a server.
+func EncodeHTTPGenericResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	marshaller := protojson.MarshalOptions{UseProtoNames: false}
+
+	b, err := marshaller.Marshal(response.(proto.Message))
+	if err != nil {
+		return err
+	}
+	w.Write(b)
+	return nil
+}
 
 // HeadersToContext adds all HTTP header values into the passed context.Context. The keys
 // are added with request.ContextKey as and lookups should be performed by using the same
