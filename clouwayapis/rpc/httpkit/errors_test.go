@@ -68,7 +68,7 @@ func TestEncodeError(t *testing.T) {
 			want: want{
 				headers: map[string]string{"Content-Type": "application/json; charset=utf-8"},
 				status:  http.StatusConflict,
-				body:    `{"message":"item already added", "errors":[{"reason":"Item with id '123' already exists", "field":"itemId"}]}`,
+				body:    `{"message":"item already added","errors":[{"reason":"Item with id '123' already exists","field":"itemId"}]}`,
 			},
 		},
 	}
