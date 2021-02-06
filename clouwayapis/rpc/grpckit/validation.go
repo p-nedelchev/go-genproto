@@ -6,7 +6,6 @@ package grpckit
 // status errors.
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/clouway/go-genproto/clouwayapis/rpc/errdetails"
@@ -20,18 +19,15 @@ import (
 func ValidateRequest(req interface{}) error {
 	f, ok := req.(validator)
 	if !ok {
-		fmt.Println("not validator")
 		return nil
 	}
 	err := f.Validate()
 	if err == nil {
-		fmt.Println("no error from validate")
 		return nil
 	}
 
 	verr, ok := err.(validationError)
 	if !ok {
-		fmt.Println("no a validation error")
 		return nil
 	}
 
