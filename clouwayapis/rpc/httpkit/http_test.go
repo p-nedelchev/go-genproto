@@ -18,12 +18,25 @@ func TestEncodeHTTPGenericResponse(t *testing.T) {
 	httpkit.EncodeHTTPGenericResponse(context.Background(), w, protoResponse)
 	b, _ := ioutil.ReadAll(w.Result().Body)
 	body := string(b)
-	want := `{"reason":"Test Reason"}`
+	want := `{"reason":"Test Reason","domain":"","metadata":{}}`
 
 	if body != want {
 		t.Errorf("unexpected response of EncodeHTTPGenericResponse:\n- want: %v\n-  got: %v", want, body)
 	}
+}
 
+func TestEncodeHTTPGenericResponseWithEmptySlice(t *testing.T) {
+	protoResponse := &errdetails.BadRequest{Errors: []*errdetails.BadRequest_FieldViolation{}}
+	w := httptest.NewRecorder()
+	httpkit.EncodeHTTPGenericResponse(context.Background(), w, protoResponse)
+
+	b, _ := ioutil.ReadAll(w.Result().Body)
+	body := string(b)
+	want := `{"message":"","errors":[]}`
+
+	if body != want {
+		t.Errorf("unexpected response of EncodeHTTPGenericResponse:\n- want: %v\n-  got: %v", want, body)
+	}
 }
 
 func TestHeadersToContext(t *testing.T) {

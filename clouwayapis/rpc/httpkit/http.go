@@ -19,7 +19,7 @@ func UnmarshalJSON(b []byte, m proto.Message) error {
 // EncodeHTTPGenericResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer. Primarily useful in a server.
 func EncodeHTTPGenericResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	marshaller := protojson.MarshalOptions{UseProtoNames: false}
+	marshaller := protojson.MarshalOptions{EmitUnpopulated: true, UseProtoNames: false}
 
 	b, err := marshaller.Marshal(response.(proto.Message))
 	if err != nil {
