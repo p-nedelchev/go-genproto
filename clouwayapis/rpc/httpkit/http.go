@@ -2,9 +2,11 @@ package httpkit
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/clouway/go-genproto/clouwayapis/rpc/fileserve"
 	"github.com/clouway/go-genproto/clouwayapis/rpc/request"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -19,6 +21,13 @@ func UnmarshalJSON(b []byte, m proto.Message) error {
 // EncodeHTTPGenericResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer. Primarily useful in a server.
 func EncodeHTTPGenericResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	if f, ok := response.(*fileserve.BinaryFile); ok {
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", f.FileName))
+		w.Header().Set("Content-Type", f.ContentType)
+		w.Write(f.Content)
+		return nil
+	}
+
 	marshaller := protojson.MarshalOptions{EmitUnpopulated: true, UseProtoNames: false}
 
 	b, err := marshaller.Marshal(response.(proto.Message))

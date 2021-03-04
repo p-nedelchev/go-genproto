@@ -5,9 +5,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/clouway/go-genproto/clouwayapis/rpc/errdetails"
+	"github.com/clouway/go-genproto/clouwayapis/rpc/fileserve"
 	"github.com/clouway/go-genproto/clouwayapis/rpc/httpkit"
 	"github.com/clouway/go-genproto/clouwayapis/rpc/request"
 )
@@ -23,6 +25,37 @@ func TestEncodeHTTPGenericResponse(t *testing.T) {
 	if body != want {
 		t.Errorf("unexpected response of EncodeHTTPGenericResponse:\n- want: %v\n-  got: %v", want, body)
 	}
+}
+
+func TestEncodeBinaryFile(t *testing.T) {
+	protoResponse := &fileserve.BinaryFile{ContentType: "image/jpg", FileName: "MyImage.jpg", Content: []byte("::content::")}
+
+	w := httptest.NewRecorder()
+	httpkit.EncodeHTTPGenericResponse(context.Background(), w, protoResponse)
+
+	b, _ := ioutil.ReadAll(w.Result().Body)
+	contentDisposition := w.Header().Get("Content-Disposition")
+	contentType := w.Header().Get("Content-Type")
+
+	wantContentType := "image/jpg"
+	wantContentDisposition := "attachment; filename=MyImage.jpg"
+	want := []byte("::content::")
+
+	if !reflect.DeepEqual(want, b) {
+		t.Errorf("unexpected binary response of EncodeHTTPGenericResponse:\n- want: %v\n-  got: %v", want, b)
+		return
+	}
+
+	if contentDisposition != wantContentDisposition {
+		t.Errorf("unexpected Content-Disposition header:\n- want: %v\n-  got: %v", wantContentDisposition, contentDisposition)
+		return
+	}
+
+	if wantContentType != contentType {
+		t.Errorf("unexpected Content-Type header:\n- want: %v\n-  got: %v", wantContentType, contentType)
+		return
+	}
+
 }
 
 func TestEncodeHTTPGenericResponseWithEmptySlice(t *testing.T) {
