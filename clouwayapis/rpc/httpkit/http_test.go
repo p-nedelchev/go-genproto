@@ -99,3 +99,17 @@ func TestHeadersToContextExcluding(t *testing.T) {
 		t.Errorf("unexpected value of exluded field:\n- want: %v\n-  got: %v", nil, got)
 	}
 }
+
+func TestCookiesToContext(t *testing.T) {
+	ctx := context.Background()
+
+	req, _ := http.NewRequest("GET", "", nil)
+	req.AddCookie(&http.Cookie{Name: "SID", Value: "123"})
+
+	ctx = httpkit.CookiesToContext(ctx, req)
+	got := ctx.Value(request.ContextKey("sid"))
+	want := "123"
+	if got != want {
+		t.Errorf("unexpected cookie value in context :\n- want: %v\n-  got: %v", want, got)
+	}
+}

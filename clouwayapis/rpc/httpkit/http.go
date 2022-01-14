@@ -73,3 +73,12 @@ func HeadersToContextExcluding(ctx context.Context, r *http.Request, excludeHead
 
 	return ctx
 }
+
+// CookiesToContext appends all cookies from the request to Context.
+func CookiesToContext(ctx context.Context, r *http.Request) context.Context {
+	for _, c := range r.Cookies() {
+		key := strings.ToLower(c.Name)
+		ctx = context.WithValue(ctx, request.ContextKey(key), c.Value)
+	}
+	return ctx
+}
