@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,15 +30,30 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on BinaryFile with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *BinaryFile) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BinaryFile with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in BinaryFileMultiError, or
+// nil if none found.
+func (m *BinaryFile) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BinaryFile) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for ContentType
 
@@ -46,8 +61,27 @@ func (m *BinaryFile) Validate() error {
 
 	// no validation rules for Content
 
+	if len(errors) > 0 {
+		return BinaryFileMultiError(errors)
+	}
 	return nil
 }
+
+// BinaryFileMultiError is an error wrapping multiple validation errors
+// returned by BinaryFile.ValidateAll() if the designated constraints aren't met.
+type BinaryFileMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BinaryFileMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BinaryFileMultiError) AllErrors() []error { return m }
 
 // BinaryFileValidationError is the validation error returned by
 // BinaryFile.Validate if the designated constraints aren't met.

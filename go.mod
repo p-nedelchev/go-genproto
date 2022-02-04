@@ -4,12 +4,10 @@ go 1.15
 
 require (
 	github.com/go-kit/kit v0.10.0
-	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/mux v1.7.3
-	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
-	golang.org/x/text v0.3.5 // indirect
-	google.golang.org/genproto v0.0.0-20210204154452-deb828366460 // indirect
-	google.golang.org/grpc v1.35.0
-	google.golang.org/protobuf v1.25.0
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27 // indirect
+	google.golang.org/genproto v0.0.0-20220204002441-d6cc3cc0770e // indirect
+	google.golang.org/grpc v1.44.0
+	google.golang.org/protobuf v1.27.1
 )
