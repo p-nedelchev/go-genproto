@@ -24,7 +24,6 @@ const JSONContentType = "application/json; charset=utf-8"
 func NewBadRequestError(format string, a ...interface{}) error {
 	st := status.Newf(codes.InvalidArgument, format, a...)
 	return st.Err()
-
 }
 
 // ErrorEncoder writes the error to the ResponseWriter, by default a content
@@ -56,6 +55,8 @@ func ErrorEncoder(_ context.Context, err error, w http.ResponseWriter) {
 		} else {
 			body, _ = json.Marshal(errorWrapper{Message: e.Message()})
 		}
+	} else if marshaler, ok := err.(json.Marshaler); ok {
+		body, _ = marshaler.MarshalJSON()
 	} else {
 		body, _ = json.Marshal(errorWrapper{Message: err.Error()})
 		if marshaler, ok := err.(json.Marshaler); ok {
@@ -73,20 +74,55 @@ type errorWrapper struct {
 	Message string `json:"message"`
 }
 
-// httpError satisfies the Headerer and StatusCoder interfaces in
+// HttpError satisfies the Headerer and StatusCoder interfaces in
 // package github.com/go-kit/kit/transport/http.
-type httpError struct {
-	error
-	statusCode int
-	headers    map[string][]string
+// It's used to return user defined Error objects
+// in JSON format.
+type HttpError struct {
+	// The status code that will be used for the response.
+	status int
+
+	// ErrHeaders is a map of headers that will be
+	// appended to the original headers before all
+	// to be send to the client.
+	headers map[string][]string
+
+	// A payload to be send as the response body. This field
+	// will be serialized as JSON message in MarshalJSON call
+	// to be send to the clients.
+	payload interface{}
 }
 
-func (h httpError) StatusCode() int {
-	return h.statusCode
+// NewHttpError creates an HTTP error with the given status code
+// and headers. The headers could be nil or empty if you don't
+// want such to be send back to the client.
+func NewHttpError(code int, payload interface{}, headers map[string][]string) *HttpError {
+	return &HttpError{
+		status:  code,
+		payload: payload,
+		headers: headers,
+	}
 }
 
-func (h httpError) Headers() http.Header {
+// Error implements the error interface, so the HttpError
+// could be used like any error.
+func (h HttpError) Error() string {
+	return "HttpError"
+}
+
+func (h HttpError) StatusCode() int {
+	return h.status
+}
+
+func (h HttpError) Headers() http.Header {
 	return h.headers
+}
+
+// MarshalJSON encodes payload property as JSON message
+// and returns it. The encoded payload is the message
+// that is returned as body from the ErrorEncoder.
+func (h HttpError) MarshalJSON() ([]byte, error) {
+	return json.Marshal(h.payload)
 }
 
 // httpStatusFromCode converts a gRPC error code into the corresponding HTTP response status.

@@ -18,6 +18,7 @@ type input struct {
 	message string
 	details *errdetails.BadRequest
 }
+
 type want struct {
 	headers map[string]string
 	status  int
@@ -29,7 +30,39 @@ type test struct {
 	want  want
 }
 
-func TestErrorEncoder(t *testing.T) {
+type appError struct {
+	ErrorCode     int            `json:"errorCode"`
+	ErrorMessages []errorMessage `json:"errorMessages"`
+}
+
+type errorMessage struct {
+	LanguageCode string `json:"languageCode"`
+	ErrorMessage string `json:"errorMessage"`
+}
+
+func TestEncodeJsonError(t *testing.T) {
+	rec := httptest.NewRecorder()
+	httpErr := httpkit.NewHttpError(
+		http.StatusBadRequest,
+		appError{
+			ErrorCode:     http.StatusBadRequest,
+			ErrorMessages: []errorMessage{{"en", "english error message"}},
+		},
+		nil,
+	)
+
+	httpkit.ErrorEncoder(context.Background(), httpErr, rec)
+
+	body, _ := ioutil.ReadAll(rec.Body)
+
+	gotBody := string(body)
+	wantBody := `{"errorCode":400,"errorMessages":[{"languageCode":"en","errorMessage":"english error message"}]}`
+	if wantBody != gotBody {
+		t.Errorf("unexpected body:\n- want: %v\n-  got: %v", wantBody, gotBody)
+	}
+}
+
+func TestEncodeProtoError(t *testing.T) {
 	tests := []test{
 		{
 			input: input{code: codes.NotFound, message: "not found", details: nil},
@@ -98,5 +131,4 @@ func TestErrorEncoder(t *testing.T) {
 			t.Errorf("unexpected body:\n- want: %v\n-  got: %v", test.want.body, sbody)
 		}
 	}
-
 }
