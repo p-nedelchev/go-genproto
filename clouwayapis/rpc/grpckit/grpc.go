@@ -3,6 +3,7 @@ package grpckit
 import (
 	"context"
 
+	"github.com/clouway/go-genproto/clouwayapis/rpc/fileserve"
 	"github.com/clouway/go-genproto/clouwayapis/rpc/request"
 	"google.golang.org/grpc/metadata"
 )
@@ -17,4 +18,11 @@ func MetadataToContext(ctx context.Context, md metadata.MD) context.Context {
 	}
 
 	return ctx
+}
+
+// EncodeGRPCBinaryFile is an EncodeResponseFunc in the context of gokit that converts BinaryFile
+// response
+func EncodeGRPCBinaryFile(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(*fileserve.BinaryFile)
+	return resp, nil
 }
