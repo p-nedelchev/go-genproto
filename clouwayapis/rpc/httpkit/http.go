@@ -23,6 +23,9 @@ func UnmarshalJSON(b []byte, m proto.Message) error {
 func EncodeHTTPGenericResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	if f, ok := response.(*fileserve.BinaryFile); ok {
 		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", f.FileName))
+		if f.ContentType == "application/pdf" {
+			w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%s", f.FileName))
+		}
 		w.Header().Set("Content-Type", f.ContentType)
 		w.Write(f.Content)
 		return nil
